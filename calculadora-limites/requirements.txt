@@ -1,0 +1,4 @@
+customtkinter>=5.2
+sympy>=1.12
+matplotlib>=3.7
+numpy>=1.24
