@@ -20,7 +20,9 @@ CASOS = [
     ("(x^2 - 1)/(x - 1)", "1", None, "0/0", sp.Integer(2), "Fatoração"),
     ("(x^2 - 5x + 6)/(x - 2)", "2", None, "0/0", sp.Integer(-1), "Fatoração"),
     ("(sqrt(x + 1) - 1)/x", "0", None, "0/0", sp.Rational(1, 2), "conjugado"),
-    ("(x - 4)/(sqrt(x) - 2)", "4", None, "0/0", sp.Integer(4), None),
+    ("(x - 4)/(sqrt(x) - 2)", "4", None, "0/0", sp.Integer(4), "conjugado"),
+    ("(x^3 - 3x + 2)/(x^2 - 2x + 1)", "1", None, "0/0", sp.Integer(3), "Briot-Ruffini"),
+    ("(x^2 - 1)/(x - 1)^2", "1", "+", "0/0", sp.oo, "laterais"),
     ("sen(x)/x", "0", None, "0/0", sp.Integer(1), "trigonométrico"),
     ("sin(3x)/x", "0", None, "0/0", sp.Integer(3), "trigonométrico"),
     ("(1 - cos(x))/x^2", "0", None, "0/0", sp.Rational(1, 2), "trigonométrico"),
@@ -60,6 +62,17 @@ def test_continuidade():
 ])
 def test_parse_ponto(texto, esperado):
     assert parse_ponto(texto) == esperado
+
+
+@pytest.mark.parametrize("texto", ["f(x) = x^2", "f(x)=x^2", "y = x^2", "x^2"])
+def test_parse_aceita_prefixo(texto):
+    assert parse_funcao(texto) == parse_funcao("x**2")
+
+
+def test_passo_a_passo_mostra_ruffini():
+    res = resolver(parse_funcao("(x^2 - 1)/(x - 1)"), parse_ponto("1"))
+    texto = "\n".join(c for _, c in res.passos)
+    assert "│" in texto and "(x - 1)⋅(x + 1)" in texto and "1 + 1 = 2" in texto
 
 
 @pytest.mark.parametrize("texto", ["", "x + y", "   "])

@@ -1,4 +1,6 @@
 """Leitura da função f(x) e do ponto de aproximação a."""
+import re
+
 import sympy as sp
 from sympy.parsing.sympy_parser import (
     convert_xor,
@@ -31,6 +33,10 @@ LOCALS = {
 def parse_funcao(texto: str) -> sp.Expr:
     """Converte o texto digitado em expressão SymPy. Aceita x^2, 2x, sen(x), ln(x)..."""
     if not texto or not texto.strip():
+        raise ValueError("Digite a função f(x).")
+    # aceita "f(x) = ..." ou "y = ..." no começo
+    texto = re.sub(r"^\s*(f\s*\(\s*x\s*\)|y)\s*=", "", texto)
+    if not texto.strip():
         raise ValueError("Digite a função f(x).")
     expr = parse_expr(texto, local_dict=LOCALS, transformations=TRANSFORMS)
     if not expr.free_symbols <= {x}:
